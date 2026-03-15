@@ -1,97 +1,122 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Server, Cpu, ShieldCheck, Zap } from "lucide-react";
+import { useParams } from "next/navigation";
+import { ArrowLeft, Cpu, ShieldCheck, Zap, Globe, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 
-const TROUBLESHOOTING_DATA = [
+// 1. 프로젝트별 상세 시각 자료 정의
+const PROJECT_ASSETS = {
+  cmp: {
+    heroGif: "/images/cmp/provisioning.gif", // 메인 시연
+    features: [
+      { title: "관리자 모니터링", desc: "실시간 자원 사용량 트래킹", src: "/images/cmp/admin-monitoring.gif" },
+      { title: "터미널 실시간 로그", desc: "Ansible 실행 과정 시각화", src: "/images/cmp/monitoring-terminal.gif" },
+      { title: "사용자 히스토리", desc: "과거 배포 이력 관리", src: "/images/cmp/history.png" },
+      { title: "간편한 회원가입", desc: "멀티 테넌트 환경 지원", src: "/images/cmp/signup.png" },
+    ]
+  },
+  news: {
+    heroGif: "/images/news/demo.gif", 
+    features: []
+  }
+};
+
+// 2. 트러블슈팅 데이터 (아까 작성한 내용 유지)
+const TROUBLESHOOTING = [
   {
     title: "Issue 1: 환경 동적화",
-    problem: "서버 IP, DB 주소, 로그인 경로 등이 하드코딩되어 인프라 변경 시마다 소스 수정 필요",
-    solution: "환경 변수 및 DB 기반의 SystemSetting 관리 시스템 도입으로 접속 정보 중앙 집중화",
-    result: "인프라 환경 변화에 독립적인 Cloud-Native 소프트웨어 구조 확보 및 유지보수성 향상",
-    highlight: "SystemSetting"
+    problem: "서버 IP, DB 주소 등이 하드코딩되어 인프라 변경 시 소스 수정 필요.",
+    solution: "SystemSetting 관리 시스템 도입으로 접속 정보 중앙 집중화.",
+    result: "Cloud-Native 구조 확보 및 유지보수성 향상"
   },
   {
     title: "Issue 2: 실시간 로그 스트리밍",
-    problem: "인프라 생성(Playbook) 시 수 분간 진행 상황을 알 수 없는 Black-box 현상으로 인한 사용자 불안 유발",
-    solution: "Redis(버퍼)와 WebSocket(통신)을 결합한 실시간 로그 중계 아키텍처 설계 및 구현",
-    result: "Ansible 배포 전 과정을 실시간 텍스트 로그로 시각화하여 서비스 신뢰도 향상",
-    highlight: "Redis & WebSocket"
+    problem: "인프라 생성 시 수 분간 진행 상황을 알 수 없는 Black-box 현상.",
+    solution: "Redis와 WebSocket을 결합한 실시간 로그 중계 아키텍처 구현.",
+    result: "Ansible 배포 전 과정 시각화로 서비스 신뢰도 향상"
   }
 ];
 
 export default function ProjectDetail() {
   const params = useParams();
-  const id = params.id;
+  const id = params.id as string;
+  const assets = PROJECT_ASSETS[id as keyof typeof PROJECT_ASSETS];
 
-  const isCMP = id === "cmp";
+  if (!assets) return <div className="text-white text-center py-20">Project not found.</div>;
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white p-8 md:p-24">
-      <div className="max-w-4xl mx-auto">
-        {/* 뒤로가기 버튼 */}
-        <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white mb-12 transition-colors">
-          <ArrowLeft size={20} /> Back to Portfolio
+    <main className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-20 font-sans">
+      <div className="max-w-5xl mx-auto">
+        {/* 상단 네비게이션 */}
+        <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white mb-12 transition-all w-fit">
+          <ArrowLeft size={18} /> <span>Back to Home</span>
         </Link>
 
-        {/* 프로젝트 헤더 */}
-        <header className="mb-16">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6">
-            {isCMP ? "AWS Hybrid Cloud Orchestrator" : "AI Agent News Curation"}
-          </h1>
-          <div className="flex gap-3">
-            {(isCMP ? ["Ansible", "AWS", "Terraform", "vSphere", "XigmaNAS"] : ["Python", "LLM", "MCP-Agent"]).map(tech => (
-              <span key={tech} className="px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-full text-sm text-slate-300">
-                {tech}
-              </span>
+        {/* Hero Section: 메인 시연 GIF */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+          <div className="space-y-6">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+              {id === 'cmp' ? 'AWS Hybrid Cloud Platform' : 'AI News Curation'}
+            </h1>
+            <p className="text-lg text-slate-400 leading-relaxed">
+              {id === 'cmp' 
+                ? "Terraform과 Ansible을 활용하여 복잡한 하이브리드 환경의 인프라 구축을 단 몇 번의 클릭으로 자동화하는 플랫폼입니다." 
+                : "LLM 에이전트를 활용한 지능형 뉴스 요약 시스템입니다."}
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {["Terraform", "Ansible", "AWS", "vSphere", "FastAPI"].map(tech => (
+                <span key={tech} className="px-3 py-1 bg-slate-900 border border-slate-700 rounded-md text-xs text-slate-300">
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-2xl shadow-blue-500/10">
+            <img src={assets.heroGif} alt="Hero Demo" className="w-full h-auto object-cover" />
+          </div>
+        </div>
+
+        {/* Visual Gallery 그리드 */}
+        <section className="mb-24">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+            <LayoutDashboard className="text-blue-400" size={24} /> 주요 기능 시연
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {assets.features.map((feature, idx) => (
+              <div key={idx} className="group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all">
+                <div className="aspect-video overflow-hidden">
+                  <img src={feature.src} alt={feature.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-slate-200">{feature.title}</h3>
+                  <p className="text-sm text-slate-500">{feature.desc}</p>
+                </div>
+              </div>
             ))}
           </div>
-        </header>
+        </section>
 
-        {/* PPT 내용을 반영한 핵심 섹션 */}
-        <div className="grid grid-cols-1 gap-12">
-          {/* 1. Overview */}
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold border-b border-slate-800 pb-2">Overview</h2>
-            <p className="text-slate-400 leading-relaxed text-lg">
-              {isCMP 
-                ? "인프라 제공을 위해 설계된 하이브리드 클라우드 자원 제공 및 관리 시스템입니다. vSphere 온프레미스 환경과 AWS 퍼블릭 클라우드를 유기적으로 연결했습니다."
-                : "사용자 정보 기반으로 AI 에이전트가 뉴스를 수집하고 핵심 정보를 요약하여 전달하는 자동화 파이프라인을 구축했습니다."}
-            </p>
-          </section>
-
-          {/* 2. Key Accomplishments */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-              <Zap className="text-yellow-400 mb-4" />
-              <h3 className="font-bold mb-2">Efficiency</h3>
-              <p className="text-slate-400 text-sm">기존 수동 구축 대비 배포 시간 80% 단축 성공</p>
-            </div>
-            <div className="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-              <ShieldCheck className="text-emerald-400 mb-4" />
-              <h3 className="font-bold mb-2">Stability</h3>
-              <p className="text-slate-400 text-sm">IaC 모듈화를 통한 구성 관리의 무결성 확보</p>
-            </div>
-          </section>
-
-          {/* 3. Troubleshooting */}
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold border-b border-slate-800 pb-2">Troubleshooting</h2>
-            {TROUBLESHOOTING_DATA.map((item, index) => (
-                <div key={index} className="p-6 bg-red-500/5 border border-red-500/20 rounded-2xl">
-                <h3 className="text-red-400 font-mono text-sm mb-4">{item.title}</h3>
-                <div className="space-y-3 text-slate-300 text-sm leading-relaxed">
-                    <p><span className="text-red-400/80 font-semibold">발생 문제:</span> {item.problem}</p>
-                    <p>
-                    <span className="text-blue-400/80 font-semibold">해결 방안:</span> {item.solution}
-                    </p>
-                    <p><span className="text-emerald-400/80 font-semibold">결과 및 성과:</span> {item.result}</p>
+        {/* Troubleshooting 섹션 */}
+        <section className="mb-24">
+          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+            <ShieldCheck className="text-emerald-400" size={24} /> 핵심 해결 과제
+          </h2>
+          <div className="space-y-6">
+            {TROUBLESHOOTING.map((item, idx) => (
+              <div key={idx} className="p-8 bg-red-500/5 border border-red-500/10 rounded-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Zap size={80} />
                 </div>
+                <h3 className="text-red-400 font-bold text-lg mb-4">{item.title}</h3>
+                <div className="grid gap-4 text-sm text-slate-300 leading-relaxed">
+                  <p><b className="text-slate-100">문제:</b> {item.problem}</p>
+                  <p><b className="text-slate-100">해결:</b> {item.solution}</p>
+                  <p className="text-emerald-400"><b className="text-slate-100">성과:</b> {item.result}</p>
                 </div>
+              </div>
             ))}
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
     </main>
   );

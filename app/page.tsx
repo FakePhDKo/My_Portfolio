@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* 3. Footer */}
       <footer className="mt-auto py-12 text-center text-slate-600 text-sm border-t border-slate-900">
-        © 2024 Ko Min Su. Built with Next.js & Vercel.
+        © 2026 Ko Min Su. Built with Next.js & Vercel.
       </footer>
     </main>
   );
