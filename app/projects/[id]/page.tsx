@@ -10,8 +10,8 @@ const PROJECT_ASSETS = {
   cmp: {
     heroGif: "/images/cmp/provisioning.gif", // 메인 시연
     architecture: {
-      logical: "/logical-arch.png",
-      physical: "/physical-arch.png"
+      logical: "/images/cmp/logical-arch.png",
+      physical: "/images/cmp/physical-arch.png"
     },
     features: [
       { title: "관리자 모니터링", desc: "실시간 자원 사용량 트래킹", src: "/images/cmp/admin-monitoring.gif" },
