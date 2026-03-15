@@ -27,9 +27,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  icons: {
-    icon: "app/Puppy_logo.svc.png",
-  },
 };
 
 export default function RootLayout({
