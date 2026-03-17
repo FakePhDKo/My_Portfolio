@@ -15,15 +15,35 @@ const PROJECT_ASSETS = {
     },
     features: [
       { title: "관리자 모니터링", desc: "실시간 자원 사용량 트래킹", src: "/images/cmp/admin-monitoring.gif" },
-      { title: "터미널 실시간 로그", desc: "Ansible 실행 과정 시각화", src: "/images/cmp/monitoring-terminal.gif" },
+      { title: "웹 터미널 제공", desc: "사용자가 쉽게 vm을 이용 가능", src: "/images/cmp/monitoring-terminal.gif" },
       { title: "사용자 히스토리", desc: "과거 배포 이력 관리", src: "/images/cmp/history.png" },
-      { title: "간편한 회원가입", desc: "멀티 테넌트 환경 지원", src: "/images/cmp/signup.png" },
+      { title: "사용자 가입 승인", desc: "멀티 테넌트 환경 지원", src: "/images/cmp/signup.png" },
     ]
   },
   news: {
-    heroGif: "/images/news/demo.gif",
-    architecture: null,
-    features: []
+    heroGif: "/images/news/newspage.gif", // 메인 결과 화면
+    architecture: {
+      logical: "/images/news/news-flow-logic.png", // 논문 내 설계도 캡처본
+      physical: "/images/news/system-infra.png" 
+    },
+    features: [
+      { 
+        title: "지능형 스케줄러", 
+        desc: "지정한 시간마다 에이전트가 깨어나 뉴스 소스를 탐색합니다.", 
+        src: "/images/news/scheduler.gif" 
+      },
+      { 
+        title: "자동 메일 큐레이션", 
+        desc: "요약된 핵심 정보를 사용자 맞춤형 이메일로 자동 전송합니다.", 
+        src: "/images/news/mail.gif" 
+      },
+      { 
+        title: "DB 기반 웹 아카이브", 
+        desc: "수집된 모든 데이터는 DB에 정형화되어 로컬 웹에서 언제든 열람 가능합니다.", 
+        src: "/images/news/newspage.gif" 
+      },
+    ],
+    thesisAbstract: "정보 과부하 시대에 LLM 에이전트와 MCP(Model Context Protocol)를 결합하여, 단순 수집을 넘어 사용자 페르소나에 최적화된 뉴스 요약 및 전달 자동화 파이프라인을 연구하였습니다."
   }
 };
 
@@ -32,7 +52,7 @@ const TROUBLESHOOTING = [
   {
     title: "Issue 1: 환경 동적화",
     problem: "서버 IP, DB 주소 등이 하드코딩되어 인프라 변경 시 소스 수정 필요.",
-    solution: "SystemSetting 관리 시스템 도입으로 접속 정보 중앙 집중화.",
+    solution: "GatewayVM으로 사설망 구축, 환경변수 및 SystemSettings 테이블로 데이터를 관리하여 중앙 집중화.",
     result: "Cloud-Native 구조 확보 및 유지보수성 향상"
   },
   {
