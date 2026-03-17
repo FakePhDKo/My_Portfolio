@@ -37,7 +37,8 @@ const PROJECT_DATA = {
     troubleshooting: [
       { title: "Issue 1: 환경 동적화", problem: "인프라 변경 시 하드코딩된 접속 정보 수정의 한계.", solution: "GatewayVM 기반 사설망 및 DB 중앙 설정 테이블 구축.", result: "유지보수 효율성 및 보안성 대폭 향상" },
       { title: "Issue 2: 실시간 로그 스트리밍", problem: "배포 중 진행 상황을 알 수 없는 Black-box 현상.", solution: "Redis와 WebSocket을 결합한 비동기 로그 중계 구현.", result: "배포 가시성 100% 확보 및 사용자 신뢰도 향상" }
-    ]
+    ],
+    thesisAbstract: null
   },
   news: {
     title: "AI Agent News Curation",
