@@ -1,4 +1,4 @@
-import { Server, Newspaper, Github, ExternalLink, Cpu } from "lucide-react";
+import { Server, Newspaper, Github, ExternalLink, Cpu, Award, Trophy, GraduationCap, CheckCircle2, Clock } from "lucide-react";
 import Link from "next/link";
 
 const PROJECTS = [
@@ -23,6 +23,22 @@ const PROJECTS = [
     color: "purple"
   }
 ];
+
+const ACHIEVEMENTS = {
+  certifications: [
+    { title: "RHSCA", date: "2025.09", org: "RedHat" },
+    { title: "Microsoft AI900", date: "2026.02", org: "Microsoft" },
+    { title: "KT AICE Basic", date: "2024.06", org: "KT" },
+    { title: "CKA (Certified Kubernetes Administrator)", date: "준비 중", org: "CNCF", status: "preparing" },
+    { title: "정보처리기사", date: "필기 합격", org: "한국산업인력공단", status: "preparing" },
+  ],
+  awards: [
+    { title: "DSC 생성형 AI 분석 교육 공모전 (대상)", date: "2025.01", desc: "Object Detection 모델 기반 블랙아이스 탐지 인프라" },
+    { title: "DSC 공유대학 글로벌 PBL 공모전 (최우수상)", date: "2024.11", desc: "독일 현지 해외 연수 및 교통 문제해결 프로젝트 최우우상" },
+    { title: "KT 기업체 연계 모빌리티 캠프 (최우수상)", date: "2024.08", desc: "독거노인 보조로봇 프로젝트" },
+    { title: "2023 환경데이터 활용 및 분석 공모전 (장려상)", date: "2023.07", desc: "의류 재사용 플랫폼 리-클 제안" },
+  ]
+};
 
 export default function Home() {
   return (
@@ -85,6 +101,63 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-8 py-24 border-t border-slate-900">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          
+          {/* 1. 자격증 섹션 */}
+          <div>
+            <h2 className="text-3xl font-bold mb-10 flex items-center gap-3">
+              <GraduationCap className="text-emerald-400" size={32} /> Certifications
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {ACHIEVEMENTS.certifications.map((cert, idx) => (
+                <div key={idx} className={`p-5 rounded-2xl border transition-all flex justify-between items-center group 
+                  ${cert.status === 'preparing' 
+                    ? 'bg-slate-900/20 border-slate-800/50 opacity-70' 
+                    : 'bg-slate-900/50 border-slate-800 hover:border-emerald-500/50'}`}>
+                  <div className="flex items-start gap-4">
+                    {cert.status === 'preparing' 
+                      ? <Clock className="text-slate-500 mt-1" size={20} />
+                      : <CheckCircle2 className="text-emerald-400 mt-1" size={20} />
+                    }
+                    <div>
+                      <h3 className={`font-bold ${cert.status === 'preparing' ? 'text-slate-400' : 'text-slate-100'}`}>
+                        {cert.title}
+                        {cert.status === 'preparing' && <span className="ml-2 text-[10px] px-2 py-0.5 bg-slate-800 rounded-full uppercase tracking-tighter">In Progress</span>}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">{cert.org}</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono text-slate-600">{cert.date}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. 수상 경력 섹션 */}
+          <div>
+            <h2 className="text-3xl font-bold mb-10 flex items-center gap-3">
+              <Trophy className="text-yellow-400" size={32} /> Awards
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {ACHIEVEMENTS.awards.map((award, idx) => (
+                <div key={idx} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 group hover:border-yellow-500/50 transition-all relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-5 text-yellow-400 group-hover:scale-110 transition-transform">
+                    <Award size={64} />
+                  </div>
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-bold text-slate-100 group-hover:text-yellow-400 transition-colors">{award.title}</h3>
+                    <span className="text-xs font-mono text-slate-600">{award.date}</span>
+                  </div>
+                  <p className="text-sm text-slate-400 leading-relaxed pr-8">{award.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
         </div>
       </section>
 

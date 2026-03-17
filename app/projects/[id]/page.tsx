@@ -66,8 +66,18 @@ const PROJECT_DATA = {
       { title: "웹 아카이빙", desc: "DB에 저장된 과거 뉴스 데이터 시각화", src: "/images/news/newspage.gif" },
     ],
     troubleshooting: [
-      { title: "Issue 1: LLM 환각(Hallucination)", problem: "요약 과정에서 기사에 없는 가짜 정보 생성 위험.", solution: "원본 텍스트 기반 RAG 도입 및 출처 링크 강제 매핑.", result: "큐레이션 정보의 신뢰도 및 객관성 확보" },
-      { title: "Issue 2: 수집 속도 병목", problem: "다중 소스 순차 수집 시 처리 시간 지연.", solution: "Asyncio 기반 비동기 파이프라인으로 전환.", result: "전체 처리 속도 기존 대비 약 70% 단축" }
+      { 
+        title: "Issue 1: 응답 지연 및 대화형 병목", 
+        problem: "자동화 파이프라인 중 에이전트가 즉각 요약하지 않고 사용자에게 역질문을 던지는 현상 발생.", 
+        solution: "System Prompt 최적화 및 페르소나 부여를 통한 '태스크 지향적' 응답 구조 강제.", 
+        result: "파이프라인 중단 없는 완전 자동화 달성 및 응답 신뢰성 확보" 
+      },
+      { 
+        title: "Issue 2: 다중 소스 처리 병목", 
+        problem: "다양한 뉴스 API 순차 호출 시 전체 처리 시간 지연.", 
+        solution: "Asyncio 기반 비동기 수집 파이프라인 구축.", 
+        result: "데이터 수집 및 요약 시간 기존 대비 약 70% 단축" 
+      }
     ],
     thesisAbstract: "본 논문은 정보 과부하 시대의 효율적인 정보 소비를 위해 MCP 기반 에이전트 설계 방안을 연구하였습니다. 단순 수집을 넘어 AI가 맥락을 이해하고 요약하는 자동화 파이프라인의 효율성을 입증하였습니다."
   }
