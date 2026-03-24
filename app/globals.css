@@ -24,3 +24,36 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@media print {
+  /* 1. 네비게이션, 버튼 등 인쇄에 불필요한 요소 숨기기 */
+  nav, 
+  button, 
+  .back-button, 
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  /* 2. 배경색 및 글자색 강제 설정 (다크모드 유지) */
+  body {
+    -webkit-print-color-adjust: exact;
+    background-color: #0a0a0a !important;
+    color: white !important;
+  }
+
+  /* 3. 페이지 여백 설정 */
+  @page {
+    margin: 10mm;
+  }
+
+  /* 4. 아키텍처나 이미지가 페이지 중간에 잘리지 않도록 설정 */
+  img, section {
+    page-break-inside: avoid;
+  }
+
+  /* 5. 링크 옆에 주소 표시 안 되게 하기 */
+  a:after {
+    content: "" !important;
+  }
+}

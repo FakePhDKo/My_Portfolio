@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Cpu, ShieldCheck, Zap, LayoutDashboard, Share2, FileText, Download } from "lucide-react";
+import { ArrowLeft, Cpu, ShieldCheck, Zap, LayoutDashboard, Share2, FileText, Download, Printer } from "lucide-react";
 import Link from "next/link";
 
 // 1. 프로젝트별 통합 데이터 정의 (모든 텍스트를 데이터화)
@@ -88,136 +88,178 @@ export default function ProjectDetail() {
   const id = params.id as keyof typeof PROJECT_DATA;
   const project = PROJECT_DATA[id];
 
+  // 1. PDF 추출 대상 영역을 위한 Ref
+  const printRef = useRef<HTMLDivElement>(null);
   const [archTab, setArchTab] = useState<"logical" | "physical">("logical");
+
+  // 2. PDF 다운로드 핸들러
+  const handleDownloadPDF = async () => {
+    const html2pdf = (await import("html2pdf.js")).default;
+    if (!printRef.current) return;
+
+    const options = {
+      margin: 10,
+      filename: `KominSu_${id}_Project.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: '#0a0a0a',
+        letterRendering: true
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(options as any).from(printRef.current).save();
+  };
 
   if (!project) return <div className="text-white text-center py-20">Project not found.</div>;
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-white p-6 md:p-20 font-sans">
       <div className="max-w-5xl mx-auto">
-        {/* 상단 네비게이션 */}
-        <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white mb-12 transition-all w-fit">
-          <ArrowLeft size={18} /> <span>Back to Home</span>
-        </Link>
-
-        {/* 1. Hero Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-              {project.title}
-            </h1>
-            <p className="text-lg text-slate-400 leading-relaxed font-light">
-              {project.subTitle}
-            </p>
-          </div>
-          <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-2xl shadow-blue-500/10">
-            <img src={project.heroGif} alt="Hero Demo" className="w-full h-auto" />
-          </div>
+        
+        {/* --- [상단 네비게이션 & 액션바: PDF 제외 대상] --- */}
+        <div className="flex justify-between items-center mb-12 no-print">
+          <Link href="/" className="flex items-center gap-2 text-slate-400 hover:text-white transition-all w-fit">
+            <ArrowLeft size={18} /> <span>Back to Home</span>
+          </Link>
+          
+          <button 
+            onClick={handleDownloadPDF}
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all"
+          >
+            <Printer size={16} /> PDF 리포트 저장
+          </button>
         </div>
 
-        {/* 2. Thesis Abstract (뉴스 프로젝트 전용) */}
-        {id === 'news' && project.thesisAbstract && (
-          <section className="mb-32 p-8 bg-blue-500/5 border border-blue-500/10 rounded-3xl relative overflow-hidden">
-            <div className="absolute -top-6 -right-6 opacity-5 rotate-12 text-blue-400">
-              <FileText size={160} />
+        {/* --- [PDF 추출 영역 시작: printRef] --- */}
+        <div ref={printRef} className="p-2 bg-[#0a0a0a]">
+          
+          {/* 1. Hero Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+                {project.title}
+              </h1>
+              <p className="text-lg text-slate-400 leading-relaxed font-light">
+                {project.subTitle}
+              </p>
             </div>
-            <h2 className="text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
-              <FileText size={20} /> Graduation Thesis Abstract
-            </h2>
-            <p className="text-slate-300 leading-relaxed italic relative z-10">
-              "{project.thesisAbstract}"
-            </p>
-            <button className="mt-8 flex items-center gap-2 px-6 py-3 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-sm font-bold">
-              <Download size={18} /> Full Thesis Download (PDF)
-            </button>
-          </section>
-        )}
+            <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-2xl shadow-blue-500/10">
+              <img src={project.heroGif} alt="Hero Demo" className="w-full h-auto" />
+            </div>
+          </div>
 
-        {/* 3. Architecture Section */}
-        <section className="mb-32">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-3xl font-bold flex items-center gap-3 text-slate-100">
-                <Share2 className="text-blue-400" /> System Architecture
+          {/* 2. Thesis Abstract (뉴스 프로젝트 전용) */}
+          {id === 'news' && project.thesisAbstract && (
+            <section className="mb-32 p-8 bg-blue-500/5 border border-blue-500/10 rounded-3xl relative overflow-hidden">
+              <div className="absolute -top-6 -right-6 opacity-5 rotate-12 text-blue-400">
+                <FileText size={160} />
+              </div>
+              <h2 className="text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
+                <FileText size={20} /> Graduation Thesis Abstract
               </h2>
-              <p className="text-slate-500 mt-2">프로젝트의 논리적 흐름과 물리적 구성도</p>
+              <p className="text-slate-300 leading-relaxed italic relative z-10">
+                "{project.thesisAbstract}"
+              </p>
+              {/* PDF 인쇄 시에는 버튼이 안 보이도록 no-print 추가 */}
+              <button className="mt-8 flex items-center gap-2 px-6 py-3 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-sm font-bold no-print">
+                <Download size={18} /> Full Thesis Download (PDF)
+              </button>
+            </section>
+          )}
+
+          {/* 3. Architecture Section */}
+          <section className="mb-32">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div>
+                <h2 className="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                  <Share2 className="text-blue-400" /> System Architecture
+                </h2>
+                <p className="text-slate-500 mt-2">프로젝트의 논리적 흐름과 물리적 구성도</p>
+              </div>
+              <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
+                {["logical", "physical"].map((tab) => (
+                  <button 
+                    key={tab}
+                    onClick={() => setArchTab(tab as any)}
+                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all uppercase tracking-wider ${archTab === tab ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
-              {["logical", "physical"].map((tab) => (
-                <button 
-                  key={tab}
-                  onClick={() => setArchTab(tab as any)}
-                  className={`px-6 py-2 rounded-lg text-sm font-medium transition-all uppercase tracking-wider ${archTab === tab ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-white"}`}
-                >
-                  {tab}
-                </button>
+
+            <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-4 md:p-8">
+              <div className="relative overflow-hidden rounded-xl border border-slate-800 bg-[#0a0a0a]">
+                <img 
+                  src={archTab === "logical" ? project.architecture.logical : project.architecture.physical} 
+                  alt="Architecture Diagram" 
+                  className="w-full h-auto"
+                />
+              </div>
+              
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                {project.architecture.descriptions[archTab].map((item, idx) => (
+                  <div key={idx} className="p-5 rounded-xl bg-slate-800/30 border border-slate-700/50">
+                    <h4 className={`${item.color} font-bold mb-2 font-mono text-sm uppercase`}>{item.title}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* 4. Visual Gallery 그리드 */}
+          <section className="mb-32">
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <LayoutDashboard className="text-blue-400" size={24} /> 주요 기능 시연
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {project.features.map((feature, idx) => (
+                <div key={idx} className="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
+                  <div className="aspect-video overflow-hidden border-b border-slate-800 bg-black">
+                    <img src={feature.src} alt={feature.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-bold text-slate-200 text-lg mb-1">{feature.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{feature.desc}</p>
+                  </div>
+                </div>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div className="bg-slate-900/30 border border-slate-800 rounded-3xl p-4 md:p-8">
-            <div className="relative group cursor-zoom-in overflow-hidden rounded-xl border border-slate-800">
-              <img 
-                src={archTab === "logical" ? project.architecture.logical : project.architecture.physical} 
-                alt="Architecture Diagram" 
-                className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.03]"
-              />
-            </div>
-            
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {project.architecture.descriptions[archTab].map((item, idx) => (
-                <div key={idx} className="p-5 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:bg-slate-800/50 transition-colors">
-                  <h4 className={`${item.color} font-bold mb-2 font-mono text-sm uppercase`}>{item.title}</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed">{item.desc}</p>
+          {/* 5. Troubleshooting 섹션 */}
+          <section className="mb-24">
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
+              <ShieldCheck className="text-emerald-400" size={24} /> 핵심 해결 과제
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              {project.troubleshooting.map((item, idx) => (
+                <div key={idx} className="p-8 bg-slate-900/50 border border-slate-800 rounded-2xl">
+                  <h3 className="text-emerald-400 font-bold text-xl mb-6 flex items-center gap-2">
+                     <Zap size={18} fill="currentColor" /> {item.title}
+                  </h3>
+                  <div className="space-y-4 text-slate-300">
+                    <p className="leading-relaxed"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs font-mono">PROBLEM</b> {item.problem}</p>
+                    <p className="leading-relaxed"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs font-mono">SOLUTION</b> {item.solution}</p>
+                    <p className="leading-relaxed text-emerald-400/90 font-medium"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs font-mono">RESULT</b> {item.result}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* 4. Visual Gallery 그리드 */}
-        <section className="mb-32">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-            <LayoutDashboard className="text-blue-400" size={24} /> 주요 기능 시연
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {project.features.map((feature, idx) => (
-              <div key={idx} className="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-500 transition-all">
-                <div className="aspect-video overflow-hidden border-b border-slate-800">
-                  <img src={feature.src} alt={feature.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-bold text-slate-200 text-lg mb-1">{feature.title}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{feature.desc}</p>
-                </div>
-              </div>
-            ))}
+          {/* PDF 푸터 (인쇄 시에만 노출) */}
+          <div className="hidden print:block text-center mt-12 pt-8 border-t border-slate-900">
+            <p className="text-slate-600 text-xs">Generated from MinSu's Portfolio Hub | https://puppylinux.cloud</p>
           </div>
-        </section>
+        </div>
+        {/* --- [PDF 추출 영역 끝] --- */}
 
-        {/* 5. Troubleshooting 섹션 */}
-        <section className="mb-24">
-          <h2 className="text-2xl font-bold mb-8 flex items-center gap-2">
-            <ShieldCheck className="text-emerald-400" size={24} /> 핵심 해결 과제
-          </h2>
-          <div className="grid grid-cols-1 gap-6">
-            {project.troubleshooting.map((item, idx) => (
-              <div key={idx} className="p-8 bg-slate-900/50 border border-slate-800 rounded-2xl relative overflow-hidden group">
-                <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-emerald-400">
-                  <Zap size={120} />
-                </div>
-                <h3 className="text-emerald-400 font-bold text-xl mb-6 flex items-center gap-2">
-                   <Zap size={18} fill="currentColor" /> {item.title}
-                </h3>
-                <div className="space-y-4 text-slate-300">
-                  <p className="leading-relaxed"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs">PROBLEM</b> {item.problem}</p>
-                  <p className="leading-relaxed"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs">SOLUTION</b> {item.solution}</p>
-                  <p className="leading-relaxed text-emerald-400/90 font-medium"><b className="text-slate-100 bg-slate-800 px-2 py-0.5 rounded mr-2 text-xs">RESULT</b> {item.result}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     </main>
   );
