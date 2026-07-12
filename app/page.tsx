@@ -26,10 +26,10 @@ const PROJECTS = [
 
 const ACHIEVEMENTS = {
   certifications: [
-    { title: "RHSCA", date: "2025.09", org: "RedHat" },
+    { title: "RHCSA", date: "2025.09", org: "RedHat" },
     { title: "Microsoft AI900", date: "2026.02", org: "Microsoft" },
     { title: "KT AICE Basic", date: "2024.06", org: "KT" },
-    { title: "CKA (Certified Kubernetes Administrator)", date: "준비 중", org: "CNCF", status: "preparing" },
+    { title: "CKA (Certified Kubernetes Administrator)", date: "2026.07", org: "CNCF"},
     { title: "정보처리기사", date: "필기 합격", org: "한국산업인력공단", status: "preparing" },
   ],
   awards: [
